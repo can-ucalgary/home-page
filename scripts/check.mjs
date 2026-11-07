@@ -2,23 +2,28 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Script } from 'node:vm';
 
-const html = readFileSync('index.html', 'utf8');
-const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 const errors = [];
-if (ids.length !== new Set(ids).size) errors.push('Duplicate HTML IDs');
-for (const [, attribute, value] of html.matchAll(/\b(src|href)="([^"]*)"/g)) {
-  if (!value) errors.push(`Empty ${attribute}`);
-  else if (value.startsWith('#')) {
-    if (!ids.includes(value.slice(1))) errors.push(`Missing anchor: ${value}`);
-  } else if (!/^(https?:|mailto:)/.test(value) && !existsSync(resolve(value))) {
-    errors.push(`Missing local file: ${value}`);
+for (const page of ['index.html', 'events/index.html', 'benefits/index.html']) {
+  const html = readFileSync(page, 'utf8');
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  if (ids.length !== new Set(ids).size) errors.push(page + ': duplicate IDs');
+  for (const [, attribute, value] of html.matchAll(/\b(src|href)="([^"]*)"/g)) {
+    if (!value) { errors.push(page + ': empty ' + attribute); continue; }
+    if (/^(https?:|mailto:)/.test(value)) continue;
+    const url = new URL(value, 'https://local.test/' + page);
+    let target = decodeURIComponent(url.pathname).slice(1);
+    if (!target || target.endsWith('/')) target += 'index.html';
+    if (!existsSync(resolve(target))) { errors.push(page + ': missing file ' + value); continue; }
+    if (url.hash && target.endsWith('.html')) {
+      const targetHTML = readFileSync(target, 'utf8');
+      const targetIDs = [...targetHTML.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+      if (!targetIDs.includes(decodeURIComponent(url.hash.slice(1)))) errors.push(page + ': missing anchor ' + value);
+    }
   }
+  for (const [tag] of html.matchAll(/<img\b[^>]*>/g)) if (!/\balt="[^"]+"/.test(tag)) errors.push(page + ': image needs alt text');
+  if (/https?:[^"']*(?:wp-content|i0\.wp\.com)/.test(html)) errors.push(page + ': WordPress image dependency');
+  if ([...html.matchAll(/<h1\b/g)].length !== 1) errors.push(page + ': expected one main heading');
 }
-for (const [tag] of html.matchAll(/<img\b[^>]*>/g)) {
-  if (!/\balt="[^"]+"/.test(tag)) errors.push('Image needs descriptive alt text');
-}
-if (/https?:[^"']*(?:wp-content|i0\.wp\.com)/.test(html)) errors.push('WordPress asset dependency');
-if ([...html.matchAll(/<h1\b/g)].length !== 1) errors.push('Expected one main heading');
 new Script(readFileSync('script.js', 'utf8'));
 const validDate = value => value === null || (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value);
 const nonEmpty = value => typeof value === 'string' && value.trim().length > 0;
@@ -51,7 +56,7 @@ try {
   const { pass, merchants } = JSON.parse(readFileSync('data/benefits.json', 'utf8'));
   if (!pass || !nonEmpty(pass.title) || !nonEmpty(pass.description) || !validLocalImage(pass.image) || !validURL(pass.purchaseUrl, ['https:']) || !validDate(pass.validFrom) || !validDate(pass.validUntil) || !pass.validFrom || !pass.validUntil || pass.validUntil < pass.validFrom || !Number.isInteger(pass.year) || !nonEmpty(pass.instructions) || !Array.isArray(pass.eligibility) || !pass.eligibility.every(nonEmpty) || !Array.isArray(merchants)) throw new Error('Invalid pass information');
   merchants.forEach((item, index) => {
-    if (!nonEmpty(item.name) || !nonEmpty(item.discount) || !validLocalImage(item.image)) throw new Error(`Invalid merchant or image at index ${index}`);
+    if (!nonEmpty(item.name) || !nonEmpty(item.category) || !nonEmpty(item.discount) || !validLocalImage(item.image)) throw new Error(`Invalid merchant or image at index ${index}`);
     for (const field of ['website', 'mapUrl']) if (item[field] !== null && (!nonEmpty(item[field]) || !validURL(item[field], ['http:', 'https:']))) throw new Error(`Invalid merchant ${field} at index ${index}`);
   });
   const sources = JSON.parse(readFileSync('data/asset-sources.json', 'utf8'));

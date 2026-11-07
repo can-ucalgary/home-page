@@ -1,5 +1,8 @@
 'use strict';
 
+// Resolve JSON and assets against the shared script, including nested Pages URLs.
+const siteRoot = new URL('.', document.currentScript.src);
+
 const menu = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#navigation');
 function closeMenu() {
@@ -59,7 +62,7 @@ window.addEventListener('scroll', () => {
 if (!reducedMotion.matches && window.matchMedia('(pointer: fine)').matches) {
   const hero = document.querySelector('.hero');
   let pointerFrame;
-  hero.addEventListener('pointermove', event => {
+  hero?.addEventListener('pointermove', event => {
     if (pointerFrame) return;
     pointerFrame = requestAnimationFrame(() => {
       const bounds = hero.getBoundingClientRect();
@@ -72,7 +75,7 @@ if (!reducedMotion.matches && window.matchMedia('(pointer: fine)').matches) {
 
 // JSON paths stay relative so they work under a GitHub Pages repository subpath.
 async function readContent(path) {
-  const response = await fetch(path);
+  const response = await fetch(new URL(path, siteRoot));
   if (!response.ok) throw new Error(`Could not load ${path}: ${response.status}`);
   const items = await response.json();
   if (!Array.isArray(items)) throw new Error(`Expected an array in ${path}`);
@@ -85,7 +88,7 @@ function contentElement(tag, className, text) {
   return element;
 }
 function contentURL(value, protocols) {
-  const url = new URL(value, document.baseURI);
+  const url = new URL(value, siteRoot);
   if (!protocols.includes(url.protocol)) throw new Error('Unsupported content URL');
   return url.href;
 }
@@ -100,49 +103,54 @@ async function displayEvents() {
     const events = await readContent('data/events.json');
     const timestamp = event => event.date ? Date.parse(event.date) : -Infinity;
     // Undated events follow dated ones; stable sort preserves their JSON order.
-    const latest = events.slice().sort((a, b) => {
+    const sorted = events.slice().sort((a, b) => {
       const left = timestamp(a), right = timestamp(b);
       return left === right ? 0 : right - left;
-    }).slice(0, 3);
-    const fragment = document.createDocumentFragment();
-    for (const event of latest) {
-      if (typeof event.title !== 'string' || !event.title.trim() || (event.date && !Number.isFinite(timestamp(event)))) throw new Error('Invalid event');
-      const article = contentElement('article');
-      const meta = contentElement('div', 'event-meta');
-      meta.append(contentElement('span', 'event-type', event.category));
-      if (event.date) {
-        // Interpret calendar dates in UTC to avoid displaying the previous day locally.
-        const time = contentElement('time', 'event-date', new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(event.date)));
-        time.dateTime = event.date;
-        meta.append(time);
+    });
+    function renderEvents(latest) {
+      const fragment = document.createDocumentFragment();
+      for (const event of latest) {
+        if (typeof event.title !== 'string' || !event.title.trim() || (event.date && !Number.isFinite(timestamp(event)))) throw new Error('Invalid event');
+        const article = contentElement('article');
+        const meta = contentElement('div', 'event-meta');
+        meta.append(contentElement('span', 'event-type', event.category));
+        if (event.date) {
+          // Interpret calendar dates in UTC to avoid displaying the previous day locally.
+          const time = contentElement('time', 'event-date', new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(event.date)));
+          time.dateTime = event.date;
+          meta.append(time);
+        }
+        const copy = contentElement('div', 'event-copy');
+        copy.append(meta, contentElement('h3', '', event.title), contentElement('p', '', event.description));
+        if (event.poster) {
+          article.classList.add('event-with-poster');
+          const posterLink = contentElement('a', 'event-poster-link');
+          posterLink.href = contentURL(event.poster, ['http:', 'https:']);
+          posterLink.target = '_blank';
+          posterLink.rel = 'noopener';
+          posterLink.setAttribute('aria-label', `View poster / 查看海报: ${event.title}`);
+          const poster = document.createElement('img');
+          poster.src = posterLink.href;
+          poster.alt = `${event.title} — 活动海报`;
+          poster.loading = 'lazy';
+          posterLink.append(poster);
+          article.append(posterLink);
+        }
+        article.append(copy);
+        if (event.url) {
+          const link = contentElement('a', 'event-detail-link', container.dataset.allEvents ? 'View details / 活动详情 ↗' : '↗');
+          link.href = contentURL(event.url, ['http:', 'https:', 'mailto:']);
+          link.setAttribute('aria-label', `Learn more: ${event.title}`);
+          article.append(link);
+        }
+        fragment.append(article);
       }
-      const copy = contentElement('div', 'event-copy');
-      copy.append(meta, contentElement('h3', '', event.title), contentElement('p', '', event.description));
-      if (event.poster) {
-        article.classList.add('event-with-poster');
-        const posterLink = contentElement('a', 'event-poster-link');
-        posterLink.href = contentURL(event.poster, ['http:', 'https:']);
-        posterLink.target = '_blank';
-        posterLink.rel = 'noopener';
-        posterLink.setAttribute('aria-label', `View poster / 查看海报: ${event.title}`);
-        const poster = document.createElement('img');
-        poster.src = posterLink.href;
-        poster.alt = `${event.title} — 活动海报`;
-        poster.loading = 'lazy';
-        posterLink.append(poster);
-        article.append(posterLink);
-      }
-      article.append(copy);
-      if (event.url) {
-        const link = contentElement('a', 'event-detail-link', '↗');
-        link.href = contentURL(event.url, ['http:', 'https:', 'mailto:']);
-        link.setAttribute('aria-label', `Learn more: ${event.title}`);
-        article.append(link);
-      }
-      fragment.append(article);
+      if (latest.length) container.replaceChildren(fragment);
+      else showContentStatus(container, 'New events are on the way. / 更多活动敬请期待。');
     }
-    if (latest.length) container.replaceChildren(fragment);
-    else showContentStatus(container, 'New events are on the way. / 更多活动敬请期待。');
+    if (container.dataset.allEvents) {
+      initializeCategoryFilter(sorted, document.querySelector('#events-filters'), renderEvents, 'events / 场活动');
+    } else renderEvents(sorted.slice(0, 3));
   } catch (error) {
     console.error('Events:', error);
     showContentStatus(container, 'Events are temporarily unavailable. Please contact CAN below. / 活动暂时无法加载，请通过下方链接联系我们。');
@@ -161,11 +169,11 @@ function updatePartnerControls() {
 function scrollPartners(direction) {
   partnerTrack.scrollBy({ left: direction * partnerTrack.clientWidth * 0.85, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
 }
-previousPartners.addEventListener('click', () => scrollPartners(-1));
-nextPartners.addEventListener('click', () => scrollPartners(1));
-partnerTrack.addEventListener('scroll', updatePartnerControls, { passive: true });
-if ('ResizeObserver' in window) new ResizeObserver(updatePartnerControls).observe(partnerTrack);
-else window.addEventListener('resize', updatePartnerControls);
+previousPartners?.addEventListener('click', () => scrollPartners(-1));
+nextPartners?.addEventListener('click', () => scrollPartners(1));
+partnerTrack?.addEventListener('scroll', updatePartnerControls, { passive: true });
+if (partnerTrack && 'ResizeObserver' in window) new ResizeObserver(updatePartnerControls).observe(partnerTrack);
+else if (partnerTrack) window.addEventListener('resize', updatePartnerControls);
 async function displayPartners() {
   try {
     const partners = await readContent('data/partners.json');
@@ -195,13 +203,13 @@ async function displayPartners() {
   }
 }
 // Each section can succeed even when the other JSON file is unavailable.
-displayEvents();
-displayPartners();
+if (document.querySelector('#event-items')) displayEvents();
+if (partnerTrack) displayPartners();
 
 async function displayBenefits() {
   const container = document.querySelector('#benefit-items');
   try {
-    const response = await fetch('data/benefits.json');
+    const response = await fetch(new URL('data/benefits.json', siteRoot));
     if (!response.ok) throw new Error(`Could not load benefits: ${response.status}`);
     const data = await response.json();
     if (!data.pass || !Array.isArray(data.merchants)) throw new Error('Invalid benefits data');
@@ -226,31 +234,62 @@ async function displayBenefits() {
     copy.append(details);
     overview.append(image, copy);
     fragment.append(overview);
-    const grid = contentElement('div', 'benefit-grid');
-    for (const merchant of merchants) {
-      const card = contentElement('article', 'benefit-card');
-      const logo = document.createElement('img');
-      logo.src = contentURL(merchant.image, ['http:', 'https:']);
-      logo.alt = merchant.name;
-      logo.loading = 'lazy';
-      logo.addEventListener('error', () => { logo.hidden = true; }, { once: true });
-      const body = contentElement('div', 'benefit-card-copy');
-      body.append(contentElement('p', 'benefit-discount', merchant.discount), contentElement('h3', '', merchant.name));
-      if (merchant.address) body.append(contentElement('p', 'benefit-address', merchant.address));
-      if (merchant.wechat) body.append(contentElement('p', 'benefit-address', `WeChat / 微信: ${merchant.wechat}`));
-      const url = merchant.website || merchant.mapUrl;
-      if (url) {
-        const link = contentElement('a', 'text-link', merchant.website ? 'Visit website / 网站 ↗' : 'View map / 地图 ↗');
-        link.href = contentURL(url, ['http:', 'https:']);
-        link.setAttribute('aria-label', `${merchant.name} — ${merchant.website ? 'website' : 'map'}`);
-        body.append(link);
-      }
-      card.append(logo, body);
-      grid.append(card);
-    }
-    if (merchants.length) fragment.append(grid);
-    else fragment.append(contentElement('p', 'content-status', 'Partner offers will be added here. / 商家优惠即将更新。'));
+    const listing = contentElement('div', 'benefit-listing');
+    fragment.append(listing);
     container.replaceChildren(fragment);
+    function renderMerchants(selected) {
+      const grid = contentElement('div', 'benefit-grid');
+      for (const merchant of selected) {
+        const card = contentElement('article', 'benefit-card');
+        const logo = document.createElement('img');
+        logo.src = contentURL(merchant.image, ['http:', 'https:']);
+        logo.alt = merchant.name;
+        logo.loading = 'lazy';
+        logo.addEventListener('error', () => { logo.hidden = true; }, { once: true });
+        const body = contentElement('div', 'benefit-card-copy');
+        body.append(contentElement('p', 'benefit-discount', merchant.discount), contentElement('h3', '', merchant.name));
+        if (merchant.address) body.append(contentElement('p', 'benefit-address', merchant.address));
+        if (merchant.wechat) body.append(contentElement('p', 'benefit-address', `WeChat / 微信: ${merchant.wechat}`));
+        const url = merchant.website || merchant.mapUrl;
+        if (url) {
+          const link = contentElement('a', 'text-link', merchant.website ? 'Visit website / 网站 ↗' : 'View map / 地图 ↗');
+          link.href = contentURL(url, ['http:', 'https:']);
+          link.setAttribute('aria-label', `${merchant.name} — ${merchant.website ? 'website' : 'map'}`);
+          body.append(link);
+        }
+        card.append(logo, body);
+        grid.append(card);
+      }
+      if (selected.length) {
+        listing.replaceChildren(grid);
+        if (container.dataset.benefitCarousel) {
+          grid.classList.add('benefit-track');
+          grid.id = 'benefit-track';
+          grid.tabIndex = 0;
+          grid.setAttribute('role', 'region');
+          grid.setAttribute('aria-label', 'Merchant offers — scroll horizontally / 商家优惠，可横向滚动');
+          const toolbar = contentElement('div', 'partner-toolbar');
+          toolbar.append(contentElement('span', '', 'PARTNER OFFERS / 商家优惠'));
+          const controls = contentElement('div', 'partner-controls');
+          const previous = contentElement('button', '', '←');
+          const next = contentElement('button', '', '→');
+          for (const [button, label] of [[previous, 'Previous offers / 上一组优惠'], [next, 'Next offers / 下一组优惠']]) {
+            button.type = 'button';
+            button.setAttribute('aria-label', label);
+            button.setAttribute('aria-controls', grid.id);
+          }
+          controls.append(previous, next);
+          toolbar.append(controls);
+          listing.prepend(toolbar);
+          initializeOfferScrolling(grid, previous, next);
+        }
+      } else showContentStatus(listing, 'Partner offers will be added here. / 商家优惠即将更新。');
+    }
+    const filters = document.querySelector('#benefits-filters');
+    if (filters) {
+      container.insertBefore(filters, listing);
+      initializeCategoryFilter(merchants, filters, renderMerchants, 'offers / 家商户');
+    } else renderMerchants(merchants);
   } catch (error) {
     console.error('Benefits:', error);
     showContentStatus(container, 'Benefits are temporarily unavailable. Please contact CAN. / 福利暂时无法加载，欢迎联系我们。');
@@ -258,4 +297,67 @@ async function displayBenefits() {
     container.setAttribute('aria-busy', 'false');
   }
 }
-displayBenefits();
+if (document.querySelector('#benefit-items')) displayBenefits();
+
+function initializeOfferScrolling(track, previous, next) {
+  function update() {
+    previous.disabled = track.scrollLeft <= 1;
+    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 1;
+  }
+  function move(direction) {
+    track.scrollBy({ left: direction * track.clientWidth * 0.85, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+  }
+  previous.addEventListener('click', () => move(-1));
+  next.addEventListener('click', () => move(1));
+  track.addEventListener('scroll', update, { passive: true });
+  if ('ResizeObserver' in window) new ResizeObserver(update).observe(track);
+  else window.addEventListener('resize', update);
+  update();
+}
+
+function initializeCategoryFilter(items, controls, render, noun) {
+  const labels = {
+    'CAREER & CONNECTION': 'Career & connection / 职业交流',
+    'ART & BELONGING': 'Art & belonging / 艺术与归属',
+    'PERSONAL FINANCE': 'Personal finance / 个人理财',
+    'COMMUNITY & CONNECTION': 'Community & connection / 社交互动',
+    'COMMUNITY & CULTURE': 'Community & culture / 社区文化',
+    'BAKERY & DESSERTS': 'Bakery & desserts / 烘焙甜点',
+    'DINING': 'Dining / 餐饮',
+    'MEAL DELIVERY': 'Meal delivery / 餐食配送',
+    'SHOPPING': 'Shopping / 购物',
+    'HEALTH & WELLNESS': 'Health & wellness / 健康养生'
+  };
+  const categories = [...new Set(items.map(item => item.category || 'OTHER'))];
+  const options = controls.querySelector('.filter-options');
+  const result = controls.querySelector('.filter-result');
+  const buttons = new Map();
+  let active = '';
+  function apply(category, updateURL) {
+    active = categories.includes(category) ? category : '';
+    const selected = active ? items.filter(item => (item.category || 'OTHER') === active) : items;
+    render(selected);
+    buttons.forEach((button, value) => button.setAttribute('aria-pressed', String(value === active)));
+    result.textContent = `${selected.length} / ${items.length} ${noun}${active ? ' · ' + (labels[active] || active) : ' · All / 全部'}`;
+    if (updateURL) {
+      const url = new URL(window.location.href);
+      if (active) url.searchParams.set('category', active);
+      else url.searchParams.delete('category');
+      history.pushState(null, '', url);
+    }
+  }
+  for (const category of ['', ...categories]) {
+    const count = category ? items.filter(item => (item.category || 'OTHER') === category).length : items.length;
+    const label = category ? labels[category] || category : 'All / 全部';
+    const button = contentElement('button', 'filter-button', `${label} (${count})`);
+    button.type = 'button';
+    button.dataset.category = category;
+    button.setAttribute('aria-pressed', 'false');
+    button.addEventListener('click', () => { if (category !== active) apply(category, true); });
+    buttons.set(category, button);
+    options.append(button);
+  }
+  controls.hidden = false;
+  apply(new URL(window.location.href).searchParams.get('category') || '', false);
+  window.addEventListener('popstate', () => apply(new URL(window.location.href).searchParams.get('category') || '', false));
+}

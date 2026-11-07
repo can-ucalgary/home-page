@@ -10,7 +10,7 @@ Use Node.js 20 or newer. No package installation is needed.
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. Use the local server rather than opening `index.html` directly: the events, partners, and benefits load JSON through `fetch`, which requires HTTP(S).
+Open http://127.0.0.1:4173. The dev command watches the server script and restarts when its routing code changes. Use the local server rather than opening `index.html` directly: the events, partners, and benefits load JSON through `fetch`, which requires HTTP(S).
 
 ```sh
 npm run check
@@ -28,9 +28,17 @@ The build copies only the public website files to `dist/`.
 
 All asset paths are relative, so the site works at both a repository subpath and a custom domain. This checkout has not been pushed or deployed.
 
+### If deployment fails with “Get Pages site failed / Not Found”
+
+Open [this repository's Pages settings](https://github.com/can-ucalgary/home-page/settings/pages) using a repository administrator or maintainer account. Under **Build and deployment → Source**, select **GitHub Actions**. This first-time repository setting is required before the workflow can deploy. Then push the updated workflow to `main` and run **Actions → Deploy homepage to GitHub Pages → Run workflow**. Rerunning an old failed run uses its old workflow revision.
+
+The workflow's default `GITHUB_TOKEN` cannot enable a previously unconfigured Pages site, even with `pages: write`. Adding `enablement: true` to `configure-pages` requires an additional privileged token; this project uses the one-time settings step instead. If Pages settings are unavailable, check repository access, organization policy, and whether the repository's visibility and GitHub plan support Pages.
+
+The workflow uses Node 24 Actions and an `ubuntu-24.04` runner to avoid the older Node runtime deprecation warning and changes to the `ubuntu-latest` image.
+
 ## Move ucalgarycan.ca when ready
 
-Keep the WordPress site available until the remaining pages have been migrated. This deliverable is the homepage; the event detail, partner detail, and Opportunities pages have not been recreated; annual pass benefits and merchant offers are now shown on the homepage. Homepage navigation uses local sections, email, Instagram, and LinkedIn. Imported event and partner links currently point to the original WordPress detail pages; migrate those pages and update the JSON URLs before retiring WordPress. All displayed images, including event posters, are stored locally. The optional `dateSource` links are maintenance references and are not fetched by the page.
+Keep the WordPress site available until the remaining pages have been migrated. The site includes the homepage, an events directory, and a benefits directory. Event detail, partner detail, and Opportunities pages have not been recreated. Homepage navigation uses local sections, email, Instagram, and LinkedIn. Imported event and partner links currently point to the original WordPress detail pages; migrate those pages and update the JSON URLs before retiring WordPress. All displayed images, including event posters, are stored locally. The optional `dateSource` links are maintenance references and are not fetched by the page.
 
 When the replacement site is ready, set `ucalgarycan.ca` as the custom domain in the repository's Pages settings, configure the domain's DNS for GitHub Pages, and enable HTTPS after GitHub verifies it. Keep domain registration active independently of the WordPress business hosting plan. The deployment workflow publishes an artifact; manage the custom domain through Pages settings or add a `CNAME` file to the build output when switching domains. A custom domain is intentionally not enabled in this draft.
 
@@ -91,3 +99,15 @@ Run `npm run check` after content edits to validate required fields, calendar da
 `data/benefits.json` contains a `pass` object and a `merchants` array. Edit the pass title, year, validity, purchase URL, banner, eligibility, and redemption instructions in `pass`. Each merchant has `name`, `discount`, local `image`, optional `address`, `mapUrl`, `website`, and `wechat`. Use `null` for fields that do not apply. The homepage displays all merchant offers in JSON order and loads benefits independently of events and partners. The imported offers, addresses, and redemption rules follow https://ucalgarycan.ca/benefits/; update the year and confirm merchant offers when renewing the pass.
 
 The build clears generated `dist/` before copying current files, so renamed assets do not leave obsolete copies in deployments. Downloaded originals retain their source resolution; offscreen posters, partner artwork, and benefits images use lazy loading.
+
+## Events and benefits directories
+
+- `events/index.html` serves `/events/` and shows all events, newest first, with category filters and local posters. The homepage still shows only the latest three.
+- `benefits/index.html` serves `/benefits/` and shows the annual pass plus all merchant offers in a grid with category filters. On the homepage, the annual pass summary is followed by a horizontal merchant strip with previous/next buttons, touch/trackpad scrolling, keyboard access, and a visible scrollbar.
+- Both pages reuse `script.js`, `styles.css`, and the existing JSON. Navigation and homepage section links lead to the new pages.
+- Event categories come from each entry’s `category` field in `data/events.json`.
+- Merchant categories come from `merchants[].category` in `data/benefits.json`: `BAKERY & DESSERTS`, `DINING`, `MEAL DELIVERY`, `SHOPPING`, and `HEALTH & WELLNESS`. Add a category in JSON and a filter is generated automatically; bilingual display labels can be edited in `initializeCategoryFilter` in `script.js`.
+- Filters show matching counts, support keyboard navigation, and preserve the selection in `?category=...` for sharing, refreshing, and browser back/forward.
+- JSON and asset URLs resolve relative to the shared script, so both domain-root hosting and GitHub Pages repository prefixes work. The build copies the page directories, and the local server supports directory routes and trailing-slash redirects. Restart `npm run dev` if it was running before these routes were added.
+
+If `/events/` or `/benefits/` returns `Not found` but the corresponding `index.html` works, an older preview server is still running. Stop the old terminal process with Ctrl+C and run `npm run dev` again. The current server serves directory index files and redirects slashless URLs.

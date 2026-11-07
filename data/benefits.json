@@ -25,7 +25,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/XcyKM1qE8mCK68aG7",
       "wechat": null,
-      "image": "assets/benefits/cookies-by-george.jpg"
+      "image": "assets/benefits/cookies-by-george.jpg",
+      "category": "BAKERY & DESSERTS"
     },
     {
       "name": "甜韵集 Sweet Together",
@@ -34,7 +35,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/HL2Vvy98ZpGgJuAVA",
       "wechat": null,
-      "image": "assets/benefits/sweet-together.jpg"
+      "image": "assets/benefits/sweet-together.jpg",
+      "category": "BAKERY & DESSERTS"
     },
     {
       "name": "Day Day Bistro",
@@ -43,7 +45,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/K96YVKXFMMGcv7te8",
       "wechat": null,
-      "image": "assets/benefits/day-day-bistro.jpg"
+      "image": "assets/benefits/day-day-bistro.jpg",
+      "category": "DINING"
     },
     {
       "name": "西安街头小吃 Xi’an Street Eats",
@@ -52,7 +55,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/KtWAUKxYpXy6ZhUM8",
       "wechat": null,
-      "image": "assets/benefits/xian-street-eats.png"
+      "image": "assets/benefits/xian-street-eats.png",
+      "category": "DINING"
     },
     {
       "name": "Kinno Box",
@@ -61,7 +65,8 @@
       "website": "https://www.kinnobox.com/",
       "mapUrl": null,
       "wechat": "KinnoBox",
-      "image": "assets/benefits/kinno-box.jpg"
+      "image": "assets/benefits/kinno-box.jpg",
+      "category": "MEAL DELIVERY"
     },
     {
       "name": "YONNY 鱼你",
@@ -70,7 +75,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/Y2591wAvKyueNZoz7",
       "wechat": null,
-      "image": "assets/benefits/yonny.jpg"
+      "image": "assets/benefits/yonny.jpg",
+      "category": "DINING"
     },
     {
       "name": "华人酒铺 — JT Liquor Market",
@@ -79,7 +85,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/8hKi5pFTc7FGy7te7",
       "wechat": null,
-      "image": "assets/benefits/jt-liquor-market.jpg"
+      "image": "assets/benefits/jt-liquor-market.jpg",
+      "category": "SHOPPING"
     },
     {
       "name": "杨氏整复推拿按摩 Yang’s Chinese Wellness",
@@ -88,7 +95,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/vwg33F89XHngkFmx5",
       "wechat": null,
-      "image": "assets/benefits/yangs-chinese-wellness.jpeg"
+      "image": "assets/benefits/yangs-chinese-wellness.jpeg",
+      "category": "HEALTH & WELLNESS"
     },
     {
       "name": "桂林米粉 Li’s Bowl Guilin Rice Noodles",
@@ -97,7 +105,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/j6uttTiq3Ej3PgcA7",
       "wechat": null,
-      "image": "assets/benefits/lis-bowl.jpg"
+      "image": "assets/benefits/lis-bowl.jpg",
+      "category": "DINING"
     },
     {
       "name": "云之南 South Silk Road Chinese Restaurant",
@@ -106,7 +115,8 @@
       "website": null,
       "mapUrl": "https://maps.app.goo.gl/9F6ZRXZiYwErURZe7",
       "wechat": null,
-      "image": "assets/benefits/south-silk-road.jpg"
+      "image": "assets/benefits/south-silk-road.jpg",
+      "category": "DINING"
     }
   ]
 }

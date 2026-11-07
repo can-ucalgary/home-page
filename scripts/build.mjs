@@ -8,5 +8,8 @@ for (const file of ['index.html', 'styles.css', 'script.js']) {
 }
 await cp('assets', 'dist/assets', { recursive: true });
 await cp('data', 'dist/data', { recursive: true });
+for (const page of ['events', 'benefits']) {
+  await cp(page, `dist/${page}`, { recursive: true });
+}
 await writeFile('dist/.nojekyll', '');
 console.log('Static site ready in dist/');

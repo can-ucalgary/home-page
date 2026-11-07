@@ -4,7 +4,7 @@
   "private": true,
   "description": "The GitHub Pages homepage for UCalgary Chinese Alumni Network",
   "scripts": {
-    "dev": "node scripts/serve.mjs",
+    "dev": "node --watch scripts/serve.mjs",
     "check": "node scripts/check.mjs",
     "build": "node scripts/build.mjs"
   },

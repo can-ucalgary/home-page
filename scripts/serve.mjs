@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
@@ -8,9 +8,17 @@ http.createServer(async (req, res) => {
   try {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     const relative = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
-    const file = path.resolve(root, relative);
+    let file = path.resolve(root, relative);
     if (!file.startsWith(root + path.sep) || relative.split('/').some(part => part.startsWith('.'))) {
       res.writeHead(403).end('Forbidden'); return;
+    }
+    if ((await stat(file)).isDirectory()) {
+      if (!pathname.endsWith('/')) {
+        const url = new URL(req.url, 'http://localhost');
+        res.writeHead(308, { Location: url.pathname + '/' + url.search }).end();
+        return;
+      }
+      file = path.join(file, 'index.html');
     }
     const data = await readFile(file);
     res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
