@@ -1,0 +1,112 @@
+{
+  "sourceUrl": "https://ucalgarycan.ca/benefits/",
+  "pass": {
+    "title": "2026 UCalgary Student & Alumni Annual Discount Pass",
+    "year": 2026,
+    "description": "CGSA 与 CAN 联合推出的年度折扣卡，提供合作商家折扣、指定活动优惠价和优先购票权益。",
+    "validFrom": "2026-01-01",
+    "validUntil": "2026-12-31",
+    "purchaseUrl": "https://www.eventbrite.com/e/2026-ucalgary-student-alumni-annual-discount-pass-2026-tickets-1983064846338?aff=oddtdtcreator",
+    "image": "assets/benefits/2026-annual-discount-pass.jpg",
+    "eligibility": [
+      "UCalgary alumni / 卡大校友",
+      "Current students / 本科生及研究生",
+      "Visiting scholars & postdoctoral fellows / 访问学者及博士后",
+      "Faculty & staff / 教职员工",
+      "Community members & guests / 社区成员及嘉宾"
+    ],
+    "instructions": "在 Eventbrite 购买后，向合作商家出示电子票即可使用。建议添加至手机 Wallet；截图无效。"
+  },
+  "merchants": [
+    {
+      "name": "Cookies By George Chinook",
+      "discount": "10% OFF / 9折",
+      "address": "6455 Macleod Trl SW #1148, Calgary, AB T2H 0K8",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/XcyKM1qE8mCK68aG7",
+      "wechat": null,
+      "image": "assets/benefits/cookies-by-george.jpg"
+    },
+    {
+      "name": "甜韵集 Sweet Together",
+      "discount": "15% OFF / 85折",
+      "address": "328 Centre St S #138, Calgary, AB T2G 4X6",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/HL2Vvy98ZpGgJuAVA",
+      "wechat": null,
+      "image": "assets/benefits/sweet-together.jpg"
+    },
+    {
+      "name": "Day Day Bistro",
+      "discount": "10% OFF / 9折",
+      "address": "6 Crowfoot Cir NW #101, Calgary, AB T3G 2T3",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/K96YVKXFMMGcv7te8",
+      "wechat": null,
+      "image": "assets/benefits/day-day-bistro.jpg"
+    },
+    {
+      "name": "西安街头小吃 Xi’an Street Eats",
+      "discount": "20% OFF / 8折",
+      "address": "303 Centre St S, Calgary, AB T2G 2B9",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/KtWAUKxYpXy6ZhUM8",
+      "wechat": null,
+      "image": "assets/benefits/xian-street-eats.png"
+    },
+    {
+      "name": "Kinno Box",
+      "discount": "Free drink + 10% OFF your first order / 送饮料＋首单9折",
+      "address": null,
+      "website": "https://www.kinnobox.com/",
+      "mapUrl": null,
+      "wechat": "KinnoBox",
+      "image": "assets/benefits/kinno-box.jpg"
+    },
+    {
+      "name": "YONNY 鱼你",
+      "discount": "10% OFF / 9折",
+      "address": "310 Centre St S, Calgary, AB T2G 5J8",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/Y2591wAvKyueNZoz7",
+      "wechat": null,
+      "image": "assets/benefits/yonny.jpg"
+    },
+    {
+      "name": "华人酒铺 — JT Liquor Market",
+      "discount": "10% OFF / 9折",
+      "address": "2037 26 Ave SW, Calgary, AB T2T 1E5",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/8hKi5pFTc7FGy7te7",
+      "wechat": null,
+      "image": "assets/benefits/jt-liquor-market.jpg"
+    },
+    {
+      "name": "杨氏整复推拿按摩 Yang’s Chinese Wellness",
+      "discount": "10% OFF / 9折",
+      "address": "1318 Centre St N #101, Calgary, AB T2E 2R7",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/vwg33F89XHngkFmx5",
+      "wechat": null,
+      "image": "assets/benefits/yangs-chinese-wellness.jpeg"
+    },
+    {
+      "name": "桂林米粉 Li’s Bowl Guilin Rice Noodles",
+      "discount": "10% OFF / 9折",
+      "address": "303 Centre St S, Calgary, AB T2G 2B9",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/j6uttTiq3Ej3PgcA7",
+      "wechat": null,
+      "image": "assets/benefits/lis-bowl.jpg"
+    },
+    {
+      "name": "云之南 South Silk Road Chinese Restaurant",
+      "discount": "赠玫瑰红糖冰粉一份或软饮一罐",
+      "address": "1130 10 Ave SW, Calgary, AB T2R 0B6",
+      "website": null,
+      "mapUrl": "https://maps.app.goo.gl/9F6ZRXZiYwErURZe7",
+      "wechat": null,
+      "image": "assets/benefits/south-silk-road.jpg"
+    }
+  ]
+}
