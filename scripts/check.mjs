@@ -1,30 +1,26 @@
-import { readFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { Script } from 'node:vm';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { transformWithOxc } from 'vite';
 
 const errors = [];
 for (const page of ['index.html', 'events/index.html', 'benefits/index.html']) {
   const html = readFileSync(page, 'utf8');
-  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
-  if (ids.length !== new Set(ids).size) errors.push(page + ': duplicate IDs');
-  for (const [, attribute, value] of html.matchAll(/\b(src|href)="([^"]*)"/g)) {
-    if (!value) { errors.push(page + ': empty ' + attribute); continue; }
-    if (/^(https?:|mailto:)/.test(value)) continue;
-    const url = new URL(value, 'https://local.test/' + page);
-    let target = decodeURIComponent(url.pathname).slice(1);
-    if (!target || target.endsWith('/')) target += 'index.html';
-    if (!existsSync(resolve(target))) { errors.push(page + ': missing file ' + value); continue; }
-    if (url.hash && target.endsWith('.html')) {
-      const targetHTML = readFileSync(target, 'utf8');
-      const targetIDs = [...targetHTML.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
-      if (!targetIDs.includes(decodeURIComponent(url.hash.slice(1)))) errors.push(page + ': missing anchor ' + value);
-    }
+  if (!html.includes('id="root"') || !/<script type="module"/.test(html)) errors.push(page + ': missing React entry');
+  if (!/<title>[^<]+<\/title>/.test(html)) errors.push(page + ': missing title');
+  for (const [, value] of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
+    if (!/^(https?:|mailto:|#)/.test(value) && !existsSync(resolve(dirname(page), value))) errors.push(page + ': missing ' + value);
   }
-  for (const [tag] of html.matchAll(/<img\b[^>]*>/g)) if (!/\balt="[^"]+"/.test(tag)) errors.push(page + ': image needs alt text');
-  if (/https?:[^"']*(?:wp-content|i0\.wp\.com)/.test(html)) errors.push(page + ': WordPress image dependency');
-  if ([...html.matchAll(/<h1\b/g)].length !== 1) errors.push(page + ': expected one main heading');
 }
-new Script(readFileSync('script.js', 'utf8'));
+function sourceFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? sourceFiles(directory + '/' + entry.name) : [directory + '/' + entry.name]);
+}
+for (const file of sourceFiles('src').filter(file => /\.(jsx|js)$/.test(file))) {
+  const code = readFileSync(file, 'utf8');
+  try { await transformWithOxc(code, file); } catch (error) { errors.push(file + ': ' + error.message); }
+  for (const [, imported] of code.matchAll(/(?:from\s*|import\s*)['"](\.[^'"]+)['"]/g)) {
+    if (!existsSync(resolve(dirname(file), imported))) errors.push(file + ': missing import ' + imported);
+  }
+}
 const validDate = value => value === null || (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value);
 const nonEmpty = value => typeof value === 'string' && value.trim().length > 0;
 function validURL(value, protocols) {
@@ -61,4 +57,4 @@ try {
   });
 } catch (error) { errors.push(`Benefits/assets: ${error.message}`); }
 if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1; }
-else console.log('Passed: local assets, anchors, IDs, image descriptions, heading, JavaScript syntax, and JSON content validation.');
+else console.log('Passed: React entrypoints, component syntax/imports, local images, and JSON content validation.');

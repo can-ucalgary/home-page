@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-site-root="../">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,28 +10,10 @@
   <meta property="og:type" content="website">
   <title>Events · 活动 — UCalgary Chinese Alumni Network</title>
   <link rel="icon" href="../assets/brand/logo.png" type="image/png">
-  <link rel="stylesheet" href="../styles.css">
-  <script src="../script.js" defer></script>
 </head>
 <body data-page="events">
-<a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="../" aria-label="UCalgary Chinese Alumni Network home">
-        <img class="brand-logo" src="../assets/brand/logo.png" width="500" height="500" alt="UCalgary Chinese Alumni Network logo">
-        <span class="brand-name"><strong lang="zh-Hans">卡大中国校友圈</strong><span>UCalgary Chinese Alumni Network</span></span>
-      </a>
-      <button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu <span aria-hidden="true">☰</span></button>
-      <nav id="navigation" aria-label="Main navigation">
-        <a href="../#about">About <span lang="zh-Hans">关于</span></a>
-        <a href="../events/" aria-current="page">Events <span lang="zh-Hans">活动</span></a>
-        <a href="../benefits/">Benefits <span lang="zh-Hans">福利</span></a>
-        <a href="../#resources">Resources <span lang="zh-Hans">资源</span></a>
-        <a class="button button-small" href="../#connect">Get connected <span aria-hidden="true">↗</span></a>
-      </nav>
-    </div>
-  </header>
-<main id="main"><section class="directory-hero"><div class="container"><a class="breadcrumb" href="../">← Home / 首页</a><p class="eyebrow">IN GOOD COMPANY / 校友活动</p><div class="directory-intro"><h1>Find your next<br><em>connection.</em></h1><div><p>Conversations, creativity, and a community to grow with.</p><p lang="zh-Hans">从职业交流到艺术创作，找到属于你的下一场相遇。</p></div></div></div></section><section class="section container directory-content" aria-label="All events / 全部活动"><div class="directory-filters" id="events-filters" hidden><p class="eyebrow">BROWSE BY CATEGORY / 按分类浏览</p><div class="filter-options" role="group" aria-label="Event categories / 分类筛选"></div><p class="filter-result" role="status" aria-live="polite" aria-atomic="true"></p></div><div id="event-items" class="event-directory" data-all-events="true" aria-busy="true"><p class="content-status" role="status">Loading events… / 正在加载活动</p></div><noscript><p>Enable JavaScript to browse events, or <a href="mailto:can.ucalgary@gmail.com">contact CAN</a>.</p></noscript></section><aside class="container directory-contact"><div><h2>Have an idea for our next gathering?</h2><p lang="zh-Hans">欢迎分享活动创意，或与我们一起策划下一次相聚。</p></div><a class="button" href="mailto:can.ucalgary@gmail.com">Get in touch / 联系我们 ↗</a></aside></main>
-  <footer class="container"><div class="footer-main"><a href="../" aria-label="Back to home"><img class="footer-logo" src="../assets/brand/logo.png" width="500" height="500" alt="UCalgary 中国校友圈 — Chinese Alumni Network"></a><p>Rooted in a shared experience.<br>Growing through each other.</p><a class="text-link" href="#main">Back to top ↑</a></div><div class="footer-bottom"><span>© <span id="year">2026</span> UCalgary Chinese Alumni Network. All rights reserved.</span><span lang="zh-Hans">兼爱互利，海纳百川</span></div></footer>
+  <div id="root"></div>
+  <noscript>Please enable JavaScript to view the UCalgary Chinese Alumni Network website.</noscript>
+  <script type="module" src="../src/main.jsx"></script>
 </body>
 </html>

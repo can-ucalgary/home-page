@@ -1,112 +1,99 @@
 # UCalgary Chinese Alumni Network
 
-A responsive, bilingual homepage for CAN / 卡大中国校友圈, rebuilt from the existing [WordPress website](https://ucalgarycan.ca/) for GitHub Pages. Plain HTML, CSS, and JavaScript; no runtime dependencies or WordPress subscription needed.
+A bilingual React website for CAN / 卡大中国校友圈, built with Vite and deployed as static files on GitHub Pages. The refactor keeps the existing CSS, images, content, layouts, and interactions.
 
-## Preview
+## Development
 
-Use Node.js 20 or newer. No package installation is needed.
+Use Node.js 22.12 or newer; Node 24 is used in deployment.
 
 ```sh
+npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. The dev command watches the server script and restarts when its routing code changes. Use the local server rather than opening `index.html` directly: the events, partners, and benefits load JSON through `fetch`, which requires HTTP(S).
+Open http://127.0.0.1:4173. Vite serves all three pages and reloads component edits. Stop any old preview process before starting Vite on the same port. JSON changes appear after refreshing the page.
 
 ```sh
 npm run check
 npm run build
+npm run preview
 ```
 
-The build copies only the public website files to `dist/`.
+Stop the development server before starting the production preview, or use `npm run preview -- --port 4174`. Serve the site over HTTP rather than opening HTML files directly.
 
-## Deploy to GitHub Pages
+## Pages and shared components
 
-1. Commit and push this project to the `main` branch of `can-ucalgary/home-page`.
-2. In the repository's **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source.
-3. Run **Actions → Deploy homepage to GitHub Pages → Run workflow**, or push a new commit to `main`.
-4. The workflow validates and publishes `dist/`. Its deployment output provides the live URL, normally `https://can-ucalgary.github.io/home-page/`.
+Three physical HTML entrypoints preserve direct links and refreshes on GitHub Pages without rewrite rules:
 
-All asset paths are relative, so the site works at both a repository subpath and a custom domain. This checkout has not been pushed or deployed.
+| URL | HTML entrypoint | React page |
+| --- | --- | --- |
+| `/` | `index.html` | `src/pages/HomePage.jsx` |
+| `/events/` | `events/index.html` | `src/pages/EventsPage.jsx` |
+| `/benefits/` | `benefits/index.html` | `src/pages/BenefitsPage.jsx` |
 
-### If deployment fails with “Get Pages site failed / Not Found”
+The HTML files contain page metadata and the React mount point. Edit visible page content in `src/`, rather than in the HTML entrypoints.
 
-Open [this repository's Pages settings](https://github.com/can-ucalgary/home-page/settings/pages) using a repository administrator or maintainer account. Under **Build and deployment → Source**, select **GitHub Actions**. This first-time repository setting is required before the workflow can deploy. Then push the updated workflow to `main` and run **Actions → Deploy homepage to GitHub Pages → Run workflow**. Rerunning an old failed run uses its old workflow revision.
+- `src/App.jsx` selects the page from the HTML entrypoint.
+- `src/components/SiteLayout.jsx` shares the header, navigation, mobile menu, and footer.
+- `src/components/DirectoryLayout.jsx` shares the events/benefits page introduction and contact section.
+- `src/components/Events.jsx` shares event cards between the homepage's latest three and the complete directory.
+- `src/components/Benefits.jsx` shares the annual pass overview and merchant cards between both pages.
+- `src/components/Partners.jsx` renders community partner cards.
+- `src/components/Carousel.jsx` shares the partner and homepage merchant scrolling controls.
+- `src/components/CategoryFilter.jsx` shares category buttons, counts, and selected states.
+- `src/hooks/` manages JSON loading, category URL/history state, horizontal scrolling, and motion preferences. Listeners and observers are cleaned up when components unmount.
+- `src/lib/site.js` contains site-relative URL helpers, event sorting/date formatting, bilingual category labels, and status messages.
+- `styles.css` remains the existing stylesheet. Vite CSS minification is disabled to avoid optimizer rewrites during this appearance-preserving refactor.
 
-The workflow's default `GITHUB_TOKEN` cannot enable a previously unconfigured Pages site, even with `pages: write`. Adding `enablement: true` to `configure-pages` requires an additional privileged token; this project uses the one-time settings step instead. If Pages settings are unavailable, check repository access, organization policy, and whether the repository's visibility and GitHub plan support Pages.
+## Content
 
-The workflow uses Node 24 Actions and an `ubuntu-24.04` runner to avoid the older Node runtime deprecation warning and changes to the `ubuntu-latest` image.
+Content remains in editable JSON files fetched at runtime. All three sections handle loading errors independently.
 
-## Move ucalgarycan.ca when ready
+### Events
 
-Keep the WordPress site available until the remaining pages have been migrated. The site includes the homepage, an events directory, and a benefits directory. Event detail, partner detail, and Opportunities pages have not been recreated. Homepage navigation uses local sections, email, Instagram, and LinkedIn. Imported event links currently point to the original WordPress detail pages; migrate those pages and update the JSON URLs before retiring WordPress. Partner cards have no outgoing links. All displayed images, including event posters, are stored locally.
-
-When the replacement site is ready, set `ucalgarycan.ca` as the custom domain in the repository's Pages settings, configure the domain's DNS for GitHub Pages, and enable HTTPS after GitHub verifies it. Keep domain registration active independently of the WordPress business hosting plan. The deployment workflow publishes an artifact; manage the custom domain through Pages settings or add a `CNAME` file to the build output when switching domains. A custom domain is intentionally not enabled in this draft.
-
-## Content and maintenance
-
-- Edit headings, section descriptions, and general links in `index.html`.
-- Edit events in `data/events.json`, community partners in `data/partners.json`, and annual pass/merchant offers in `data/benefits.json`; the page loads both dynamically. The build copies `data/` into `dist/`, so this works on GitHub Pages without a backend.
-- Edit colors, typography, and responsive layout in `styles.css`.
-- `script.js` controls the mobile navigation, scroll effects, JSON rendering, partner scrolling, and copyright year.
-- `assets/` contains local copies of images and selected partner logos from the existing website, plus the supplied `assets/brand/logo.png`, used in the header, footer, and browser favicon. No images rely on WordPress hosting. The campus photo is retained. The primary color is `#ffadad` and the secondary color is `#C8A2FF`, with dark text for contrast.
-- Existing events are presented as community highlights, with no invented future dates or registration links. Update the section when new events are confirmed.
-- The AI chatbot is described as a vision, not an available product.
-- **Newsletter:** the WordPress signup form is replaced by an explicitly labeled email contact action. It opens a draft in the visitor's email app; it does not store addresses or automatically subscribe anyone. To restore automatic subscriptions, connect a newsletter provider's hosted form, and update the button and accompanying text.
-- Community organization names and the three strategic pillars come from the existing website. Partner logos remain the property of their respective owners. Original stock-photo source filenames: `pexels-olly-3830745.jpg`; campus: `0.jpeg`.
-
-The visual design uses an immersive, full-width campus backdrop, staggered oversized headings, a translucent introduction panel, and pink/purple gradients inspired by https://phanvic.ca/. All visual effects are implemented locally in CSS and JavaScript; no reference-site assets or runtime dependencies are used. Scroll reveals, subtle background movement, and hover states respect reduced-motion preferences. The site uses system fonts, so visitors do not need third-party font services.
-
-## JSON content
-
-`data/events.json` is an array of events:
+Edit `data/events.json`. Each entry has:
 
 ```json
 {
   "title": "Event title",
-  "date": "2026-11-06",
-  "category": "COMMUNITY & CULTURE",
+  "date": "2026-11-13",
+  "category": "COMMUNITY & CONNECTION",
   "description": "A short description.",
   "url": "https://example.com/event",
   "poster": "assets/events/event-poster.jpg"
 }
 ```
 
-The date above is a format example, not a real CAN event. Use the actual event date in `YYYY-MM-DD` format. The homepage sorts dates newest first and displays at most three entries, including future events when present. Equal dates retain their order in the file. The imported WordPress list contains ten events. Nine event dates were verified from their local posters; these are event dates, not WordPress publication dates. The 7-Day Matchmaking Challenge poster specifies March 2026 without an exact day, so its `date` remains `null`; undated events follow dated ones in JSON order. Use `url: null` if there is no event link. An empty array shows a friendly empty state.
+This is a format example. Use the actual event date in `YYYY-MM-DD` format. Events sort newest first, with equal dates retaining JSON order. Use `date: null` when the exact date is unknown; those entries follow dated events in JSON order. Use `url: null` when there is no details/registration link. The homepage shows the latest three; `/events/` shows all entries and supports category filtering. Posters open their local full-size files in a new tab.
 
-`data/partners.json` is an array of partners:
+### Partners
 
-```json
-{
-  "name": "Partner name",
-  "logo": "assets/partners/partner-logo.png",
-  "url": null
-}
-```
+Edit `data/partners.json`. Each entry has a `name`, local `logo`, optional information `image` and `description`, and `url`. Current links are disabled with `url: null`. Cards display in JSON order in a horizontal list, with previous/next buttons, keyboard and touch/trackpad scrolling, and a visible scrollbar. There is no automatic scrolling. Failed images fall back to the partner name.
 
-Add the logo to `assets/partners/`. Set `url` to the partner's verified website or resource detail page to make its card clickable, or leave it `null`. Partner links are currently disabled (`url: null`), so cards display images and names without navigation. The optional `image` field retains the partner's original information artwork when it differs from the logo. Partner order follows the JSON file. The list has a visible horizontal scrollbar, touch/trackpad and keyboard scrolling, plus previous/next controls. It does not auto-scroll. Failed logos fall back to the partner name. Each section handles its own loading errors independently.
+### Benefits
 
-Run `npm run check` after content edits to validate required fields, calendar dates, links, and local logo files.
+Edit `data/benefits.json`. The `pass` object contains the title, year, validity, purchase URL, local banner, eligibility, and instructions. Each entry in `merchants` contains `name`, `category`, `discount`, local `image`, and optional `address`, `mapUrl`, `website`, and `wechat`. Use `null` for optional fields that do not apply.
 
-## Asset folders and benefits
+The homepage displays merchant cards in a horizontal strip. `/benefits/` displays a grid with category filters. Update the pass year, validity, and merchant offers when renewing the pass.
 
-- `assets/brand/`: current logo plus retained legacy brand files.
+Filters are generated from JSON categories. Add bilingual labels in `categoryLabels` in `src/lib/site.js` as needed. Selections are stored in `?category=...` for sharing, refreshing, and browser back/forward. Empty arrays show an empty state.
+
+## Images and branding
+
+- `assets/brand/`: current logo and retained legacy brand files.
 - `assets/images/`: shared campus and community photography.
-- `assets/events/`: all ten original activity posters, named by event slug. The latest three cards link to these local posters in a new tab.
-- `assets/partners/`: images for all nine entries from the resources page, with existing CGSA and Paw logos retained separately from their information artwork.
-- `assets/benefits/`: annual pass banner, ten merchant images, and two supporting photographs from the benefits page.
+- `assets/events/`: local activity posters.
+- `assets/partners/`: partner logos and information artwork.
+- `assets/benefits/`: pass banner, merchant images, and supporting photography.
 
-`data/benefits.json` contains a `pass` object and a `merchants` array. Edit the pass title, year, validity, purchase URL, banner, eligibility, and redemption instructions in `pass`. Each merchant has `name`, `discount`, local `image`, optional `address`, `mapUrl`, `website`, and `wechat`. Use `null` for fields that do not apply. The homepage displays all merchant offers in JSON order and loads benefits independently of events and partners. The imported offers, addresses, and redemption rules follow https://ucalgarycan.ca/benefits/; update the year and confirm merchant offers when renewing the pass.
+The primary color is `#ffadad`; the secondary color is `#C8A2FF`. All images are local, and fonts use the existing system-font stacks. Offscreen content images use lazy loading. Motion respects the system's reduced-motion preference. The AI chatbot remains described as a vision; the newsletter contact button opens an email draft and does not automatically subscribe anyone.
 
-The build clears generated `dist/` before copying current files, so renamed assets do not leave obsolete copies in deployments. Downloaded originals retain their source resolution; offscreen posters, partner artwork, and benefits images use lazy loading.
+## Build and GitHub Pages
 
-## Events and benefits directories
+`scripts/check.mjs` validates entrypoints, React source syntax/imports, JSON content, dates, URLs, and local images. `scripts/build.mjs` runs Vite, copies `assets/` and `data/`, and writes `.nojekyll` into `dist/`. Vite cleans obsolete build output and emits real HTML files for all three routes. Relative bundle URLs and each entrypoint's `data-site-root` support both a domain root and a GitHub Pages repository prefix.
 
-- `events/index.html` serves `/events/` and shows all events, newest first, with category filters and local posters. The homepage still shows only the latest three.
-- `benefits/index.html` serves `/benefits/` and shows the annual pass plus all merchant offers in a grid with category filters. On the homepage, the annual pass summary is followed by a horizontal merchant strip with previous/next buttons, touch/trackpad scrolling, keyboard access, and a visible scrollbar.
-- Both pages reuse `script.js`, `styles.css`, and the existing JSON. Navigation and homepage section links lead to the new pages.
-- Event categories come from each entry’s `category` field in `data/events.json`.
-- Merchant categories come from `merchants[].category` in `data/benefits.json`: `BAKERY & DESSERTS`, `DINING`, `MEAL DELIVERY`, `SHOPPING`, and `HEALTH & WELLNESS`. Add a category in JSON and a filter is generated automatically; bilingual display labels can be edited in `initializeCategoryFilter` in `script.js`.
-- Filters show matching counts, support keyboard navigation, and preserve the selection in `?category=...` for sharing, refreshing, and browser back/forward.
-- JSON and asset URLs resolve relative to the shared script, so both domain-root hosting and GitHub Pages repository prefixes work. The build copies the page directories, and the local server supports directory routes and trailing-slash redirects. Restart `npm run dev` if it was running before these routes were added.
+The workflow in `.github/workflows/deploy-pages.yml` installs locked dependencies with `npm ci`, validates, builds, and publishes `dist/` when changes are pushed to `main`. It uses Node 24 and `ubuntu-24.04`.
 
-If `/events/` or `/benefits/` returns `Not found` but the corresponding `index.html` works, an older preview server is still running. Stop the old terminal process with Ctrl+C and run `npm run dev` again. The current server serves directory index files and redirects slashless URLs.
+If a repository needs first-time setup, select **Settings → Pages → Build and deployment → Source → GitHub Actions**. The default workflow token cannot enable an unconfigured Pages site. After configuring Pages, push the updated workflow and use **Actions → Deploy homepage to GitHub Pages → Run workflow**. Rerunning an old run uses its old workflow revision.
+
+Manage `ucalgarycan.ca` and HTTPS in the repository's Pages settings and domain DNS settings. Content links use the destinations configured in JSON; update those links when moving any remaining detail pages. This refactor does not change hosting settings or publish a deployment.
