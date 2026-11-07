@@ -4,62 +4,62 @@
     "description": "支持新移民与青年提升职业技能和就业准备度。",
     "logo": "assets/partners/ecssen-career.png",
     "image": "assets/partners/ecssen-career.png",
-    "url": "https://ucalgarycan.ca/resources/ecssen_career/"
+    "url": null
   },
   {
     "name": "Diversecities（卡城华人社区服务中心）",
     "description": "提供社区联络、心理健康、儿童及青少年、法律与倡导服务。",
     "logo": "assets/partners/diversecities.png",
     "image": "assets/partners/diversecities.png",
-    "url": "https://ucalgarycan.ca/resources/diversecities/"
+    "url": null
   },
   {
     "name": "Ethan Li 保险理财顾问",
     "description": "保险与理财咨询资源。",
     "logo": "assets/partners/ethan-li.png",
     "image": "assets/partners/ethan-li.png",
-    "url": "https://ucalgarycan.ca/resources/ethan-li/"
+    "url": null
   },
   {
     "name": "Mao Projects",
     "description": "社区合作资源。",
     "logo": "assets/partners/mao-projects.jpg",
     "image": "assets/partners/mao-projects.jpg",
-    "url": "https://ucalgarycan.ca/resources/mao-projects/"
+    "url": null
   },
   {
     "name": "Paw Embroidery",
     "description": "刺绣与定制作品。",
     "logo": "assets/partners/paw-embroidery-logo.jpg",
     "image": "assets/partners/paw-embroidery.jpg",
-    "url": "https://ucalgarycan.ca/resources/paw-embroidery/"
+    "url": null
   },
   {
     "name": "Sharon Yang 理财保险顾问",
     "description": "理财与保险咨询资源。",
     "logo": "assets/partners/sharon-yang.jpg",
     "image": "assets/partners/sharon-yang.jpg",
-    "url": "https://ucalgarycan.ca/resources/sharon-yang/"
+    "url": null
   },
   {
     "name": "TZ Law",
     "description": "法律服务资源。",
     "logo": "assets/partners/tz-law.png",
     "image": "assets/partners/tz-law.png",
-    "url": "https://ucalgarycan.ca/resources/tz-law/"
+    "url": null
   },
   {
     "name": "Yuesong男士发型",
     "description": "男士发型服务。",
     "logo": "assets/partners/yuesong.png",
     "image": "assets/partners/yuesong.png",
-    "url": "https://ucalgarycan.ca/resources/yuesong%e7%94%b7%e5%a3%ab%e5%8f%91%e5%9e%8b/"
+    "url": null
   },
   {
     "name": "卡尔加里大学中国研究生协会UCalgary CGSA",
     "description": "面向卡大中国学生与学者的学术、职业发展和社区支持。",
     "logo": "assets/partners/cgsa-logo.png",
     "image": "assets/partners/cgsa.png",
-    "url": "https://ucalgarycan.ca/resources/cgsa/"
+    "url": null
   }
 ]

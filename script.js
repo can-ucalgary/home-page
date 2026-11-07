@@ -318,10 +318,8 @@ function initializeOfferScrolling(track, previous, next) {
 function initializeCategoryFilter(items, controls, render, noun) {
   const labels = {
     'CAREER & CONNECTION': 'Career & connection / 职业交流',
-    'ART & BELONGING': 'Art & belonging / 艺术与归属',
     'PERSONAL FINANCE': 'Personal finance / 个人理财',
     'COMMUNITY & CONNECTION': 'Community & connection / 社交互动',
-    'COMMUNITY & CULTURE': 'Community & culture / 社区文化',
     'BAKERY & DESSERTS': 'Bakery & desserts / 烘焙甜点',
     'DINING': 'Dining / 餐饮',
     'MEAL DELIVERY': 'Meal delivery / 餐食配送',

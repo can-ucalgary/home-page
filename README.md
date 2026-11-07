@@ -38,7 +38,7 @@ The workflow uses Node 24 Actions and an `ubuntu-24.04` runner to avoid the olde
 
 ## Move ucalgarycan.ca when ready
 
-Keep the WordPress site available until the remaining pages have been migrated. The site includes the homepage, an events directory, and a benefits directory. Event detail, partner detail, and Opportunities pages have not been recreated. Homepage navigation uses local sections, email, Instagram, and LinkedIn. Imported event and partner links currently point to the original WordPress detail pages; migrate those pages and update the JSON URLs before retiring WordPress. All displayed images, including event posters, are stored locally. The optional `dateSource` links are maintenance references and are not fetched by the page.
+Keep the WordPress site available until the remaining pages have been migrated. The site includes the homepage, an events directory, and a benefits directory. Event detail, partner detail, and Opportunities pages have not been recreated. Homepage navigation uses local sections, email, Instagram, and LinkedIn. Imported event links currently point to the original WordPress detail pages; migrate those pages and update the JSON URLs before retiring WordPress. Partner cards have no outgoing links. All displayed images, including event posters, are stored locally.
 
 When the replacement site is ready, set `ucalgarycan.ca` as the custom domain in the repository's Pages settings, configure the domain's DNS for GitHub Pages, and enable HTTPS after GitHub verifies it. Keep domain registration active independently of the WordPress business hosting plan. The deployment workflow publishes an artifact; manage the custom domain through Pages settings or add a `CNAME` file to the build output when switching domains. A custom domain is intentionally not enabled in this draft.
 
@@ -71,7 +71,7 @@ The visual design uses an immersive, full-width campus backdrop, staggered overs
 }
 ```
 
-The date above is a format example, not a real CAN event. Use the actual event date in `YYYY-MM-DD` format. The homepage sorts dates newest first and displays at most three entries, including future events when present. Equal dates retain their order in the file. The imported WordPress list contains ten events. Nine event dates were verified from their posters, linked in each entry’s optional `dateSource` field; these are event dates, not WordPress publication dates. The 7-Day Matchmaking Challenge poster specifies March 2026 without an exact day, so its `date` remains `null`; undated events follow dated ones in JSON order. Use `url: null` if there is no event link. An empty array shows a friendly empty state.
+The date above is a format example, not a real CAN event. Use the actual event date in `YYYY-MM-DD` format. The homepage sorts dates newest first and displays at most three entries, including future events when present. Equal dates retain their order in the file. The imported WordPress list contains ten events. Nine event dates were verified from their local posters; these are event dates, not WordPress publication dates. The 7-Day Matchmaking Challenge poster specifies March 2026 without an exact day, so its `date` remains `null`; undated events follow dated ones in JSON order. Use `url: null` if there is no event link. An empty array shows a friendly empty state.
 
 `data/partners.json` is an array of partners:
 
@@ -83,7 +83,7 @@ The date above is a format example, not a real CAN event. Use the actual event d
 }
 ```
 
-Add the logo to `assets/partners/`. Set `url` to the partner's verified website or resource detail page to make its card clickable, or leave it `null`. Imported cards link to their existing CAN resource pages. The optional `image` field retains the partner's original information artwork when it differs from the logo. Partner order follows the JSON file. The list has a visible horizontal scrollbar, touch/trackpad and keyboard scrolling, plus previous/next controls. It does not auto-scroll. Failed logos fall back to the partner name. Each section handles its own loading errors independently.
+Add the logo to `assets/partners/`. Set `url` to the partner's verified website or resource detail page to make its card clickable, or leave it `null`. Partner links are currently disabled (`url: null`), so cards display images and names without navigation. The optional `image` field retains the partner's original information artwork when it differs from the logo. Partner order follows the JSON file. The list has a visible horizontal scrollbar, touch/trackpad and keyboard scrolling, plus previous/next controls. It does not auto-scroll. Failed logos fall back to the partner name. Each section handles its own loading errors independently.
 
 Run `npm run check` after content edits to validate required fields, calendar dates, links, and local logo files.
 
@@ -94,7 +94,6 @@ Run `npm run check` after content edits to validate required fields, calendar da
 - `assets/events/`: all ten original activity posters, named by event slug. The latest three cards link to these local posters in a new tab.
 - `assets/partners/`: images for all nine entries from the resources page, with existing CGSA and Paw logos retained separately from their information artwork.
 - `assets/benefits/`: annual pass banner, ten merchant images, and two supporting photographs from the benefits page.
-- `data/asset-sources.json`: original download URL for each imported poster/resource/benefit image. These URLs are attribution and maintenance references, not runtime image dependencies.
 
 `data/benefits.json` contains a `pass` object and a `merchants` array. Edit the pass title, year, validity, purchase URL, banner, eligibility, and redemption instructions in `pass`. Each merchant has `name`, `discount`, local `image`, optional `address`, `mapUrl`, `website`, and `wechat`. Use `null` for fields that do not apply. The homepage displays all merchant offers in JSON order and loads benefits independently of events and partners. The imported offers, addresses, and redemption rules follow https://ucalgarycan.ca/benefits/; update the year and confirm merchant offers when renewing the pass.
 

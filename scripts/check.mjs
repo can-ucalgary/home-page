@@ -59,8 +59,6 @@ try {
     if (!nonEmpty(item.name) || !nonEmpty(item.category) || !nonEmpty(item.discount) || !validLocalImage(item.image)) throw new Error(`Invalid merchant or image at index ${index}`);
     for (const field of ['website', 'mapUrl']) if (item[field] !== null && (!nonEmpty(item[field]) || !validURL(item[field], ['http:', 'https:']))) throw new Error(`Invalid merchant ${field} at index ${index}`);
   });
-  const sources = JSON.parse(readFileSync('data/asset-sources.json', 'utf8'));
-  if (!Array.isArray(sources) || !sources.every(item => validLocalImage(item.file) && validURL(item.sourceUrl, ['https:']))) throw new Error('Invalid asset provenance or downloaded image');
 } catch (error) { errors.push(`Benefits/assets: ${error.message}`); }
 if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1; }
 else console.log('Passed: local assets, anchors, IDs, image descriptions, heading, JavaScript syntax, and JSON content validation.');
