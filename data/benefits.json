@@ -116,6 +116,16 @@
       "wechat": null,
       "image": "assets/benefits/south-silk-road.jpg",
       "category": "DINING"
+    },
+    {
+      "name": "星豆豆Twinkle Beans拼豆",
+      "discount": "10% OFF / 9折",
+      "address": "鸿图商场 Opulence Centre, 111 3 Ave SE #207, Calgary, AB T2G 0B7",
+      "website": "https://twinklebeans.ca/",
+      "mapUrl": "https://maps.app.goo.gl/ggNEcKRDTh1sc2TH8",
+      "wechat": null,
+      "image": "assets/benefits/twinklebeans.jpg",
+      "category": "ARTS & CRAFTS"
     }
   ]
 }

@@ -34,6 +34,7 @@ export const categoryLabels = {
   DINING: 'Dining / 餐饮',
   'MEAL DELIVERY': 'Meal delivery / 餐食配送',
   SHOPPING: 'Shopping / 购物',
+  'ARTS & CRAFTS': 'Arts & crafts / 手作体验',
   'HEALTH & WELLNESS': 'Health & wellness / 健康养生'
 };
 
